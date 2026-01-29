@@ -1,6 +1,6 @@
 
 name = "Aknur"
-age = 20
+age = 17
 print("Менің атым:", name)
 print("Жасым:", age)
 
