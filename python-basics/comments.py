@@ -1,8 +1,8 @@
-print("Сәлем, Python!")
+print("Hello World")
 
 
-print("Түсініктеме оң жақта") 
+print("Comment on the right") 
 
 
-# print("Бұл жол орындалмайды")
-print("Бұл жол орындалады")
+# print("This line will not run")
+print("This line will run")
