@@ -12,3 +12,5 @@ print(a.strip()) # "Hello, World!"
 b = "World"
 c = a + " " + b
 print(c)
+
+print(len(a))

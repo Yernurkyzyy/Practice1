@@ -1,4 +1,3 @@
-
 name = "Aknur"
 age = 17
 print("Менің атым:", name)
