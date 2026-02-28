@@ -22,3 +22,32 @@ print("Converted JSON:\n", json_output)
 with open("user.json", "w") as file:
     json.dump(user_data, file, indent=4)
     print("\nData successfully saved to user.json")
+
+
+
+#
+import json
+
+with open('sample-data.json', 'r') as file:
+    data = json.load(file)
+
+print("Interface Status")
+print("=" * 80)
+
+print(f"{'DN':<50} {'Description':<20} {'Speed':<7} {'MTU':<6}")
+print("-" * 50, "-" * 20, "-" * 6, "-" * 6)
+
+
+interfaces = data['imdata']
+
+for item in interfaces:
+    
+    attr = item['l1PhysIf']['attributes']
+    
+    dn = attr['dn']
+    description = attr.get('descr', '') 
+    speed = attr['speed']
+    mtu = attr['mtu']
+    
+   
+    print(f"{dn:<50} {description:<20} {speed:<7} {mtu:<6}")
