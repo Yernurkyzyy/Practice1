@@ -1,53 +1,52 @@
 import psycopg2
 import csv
-from config import params, CREATE_TABLE_COMMAND, CSV_FILE_PATH
-from connect import initialize_db
+from config import params, CREATE_TABLE_COMMAND
+from connect import initialize_db, get_connection
 
-# 1
+# 1. INSERT (from Console)
 def insert_contact(name, phone):
     sql = "INSERT INTO contacts(contact_name, phone_number) VALUES(%s, %s) ON CONFLICT DO NOTHING;"
-    with psycopg2.connect(**params) as conn:
+    with get_connection() as conn:
         with conn.cursor() as cur:
             cur.execute(sql, (name, phone))
-    print(f"Contact {name} saved.")
+            conn.commit()
 
-def upload_csv():
-    with open(CSV_FILE_PATH, 'r') as f:
+# 2. INSERT (from CSV)
+def upload_csv(file_path):
+    with open(file_path, 'r') as f:
         reader = csv.reader(f)
-        next(reader) 
+        next(reader) # skip header
         for row in reader:
             insert_contact(row[0], row[1])
+    print(" CSV data imported.")
 
-# 2
-def search_contact(query):
-    sql = "SELECT * FROM contacts WHERE contact_name ILIKE %s OR phone_number LIKE %s;"
-    with psycopg2.connect(**params) as conn:
-        with conn.cursor() as cur:
-            cur.execute(sql, (f"%{query}%", f"%{query}%"))
-            results = cur.fetchall()
-            for r in results:
-                print(f"ID: {r[0]} | Name: {r[1]} | Phone: {r[2]}")
-
-#3 
-def update_phone(name, new_phone):
+# 3. UPDATE (Name or Phone)
+def update_contact(name, new_phone):
     sql = "UPDATE contacts SET phone_number = %s WHERE contact_name = %s;"
-    with psycopg2.connect(**params) as conn:
+    with get_connection() as conn:
         with conn.cursor() as cur:
             cur.execute(sql, (new_phone, name))
-            print(f"{name}'s phone updated.")
+            conn.commit()
+    print(f" Contact {name} updated.")
 
-def delete_contact(name):
-    sql = "DELETE FROM contacts WHERE contact_name = %s;"
-    with psycopg2.connect(**params) as conn:
+# 4. QUERY (Filters: Name or Phone prefix)
+def search_contacts(query):
+    sql = "SELECT * FROM contacts WHERE contact_name ILIKE %s OR phone_number LIKE %s;"
+    with get_connection() as conn:
         with conn.cursor() as cur:
-            cur.execute(sql, (name,))
-            print(f"Contact {name} deleted.")
+            cur.execute(sql, (f"%{query}%", f"{query}%"))
+            for row in cur.fetchall():
+                print(row)
 
-# MAIN PROGRAM
+# 5. DELETE
+def delete_contact(identifier):
+    sql = "DELETE FROM contacts WHERE contact_name = %s OR phone_number = %s;"
+    with get_connection() as conn:
+        with conn.cursor() as cur:
+            cur.execute(sql, (identifier, identifier))
+            conn.commit()
+    print(f" Contact {identifier} deleted.")
+
 if __name__ == "__main__":
-    initialize_db(CREATE_TABLE_COMMAND) 
-    
-    upload_csv()
-    
-    print("\nSearch results for 'Ali':")
-    search_contact("Ali")
+    initialize_db(CREATE_TABLE_COMMAND)
+    # Осы жерден функцияларды шақырып тексеруге болады
