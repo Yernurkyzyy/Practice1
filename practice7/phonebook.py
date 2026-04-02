@@ -1,52 +1,72 @@
-import psycopg2
+import sqlite3
 import csv
-from config import params, CREATE_TABLE_COMMAND
-from connect import initialize_db, get_connection
+import os
 
-# 1. INSERT (from Console)
-def insert_contact(name, phone):
-    sql = "INSERT INTO contacts(contact_name, phone_number) VALUES(%s, %s) ON CONFLICT DO NOTHING;"
-    with get_connection() as conn:
-        with conn.cursor() as cur:
-            cur.execute(sql, (name, phone))
-            conn.commit()
+# Базаға қосылу (PostgreSQL орнына SQLite)
+def get_connection():
+    return sqlite3.connect("phonebook.db")
 
-# 2. INSERT (from CSV)
-def upload_csv(file_path):
-    with open(file_path, 'r') as f:
-        reader = csv.reader(f)
-        next(reader) # skip header
-        for row in reader:
-            insert_contact(row[0], row[1])
-    print(" CSV data imported.")
+# Кестені құру
+def create_table():
+    conn = get_connection()
+    cursor = conn.cursor()
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS phonebook(
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            username TEXT,
+            phone TEXT
+        )
+    """)
+    conn.commit()
+    conn.close()
+    print("Database initialized successfully!")
 
-# 3. UPDATE (Name or Phone)
-def update_contact(name, new_phone):
-    sql = "UPDATE contacts SET phone_number = %s WHERE contact_name = %s;"
-    with get_connection() as conn:
-        with conn.cursor() as cur:
-            cur.execute(sql, (new_phone, name))
-            conn.commit()
-    print(f" Contact {name} updated.")
+# Консольдан қосу
+def insert_from_console():
+    name = input("Enter name: ")
+    phone = input("Enter phone: ")
+    conn = get_connection()
+    cursor = conn.cursor()
+    cursor.execute("INSERT INTO phonebook (username, phone) VALUES (?, ?)", (name, phone))
+    conn.commit()
+    conn.close()
+    print(f"Contact {name} added.")
 
-# 4. QUERY (Filters: Name or Phone prefix)
-def search_contacts(query):
-    sql = "SELECT * FROM contacts WHERE contact_name ILIKE %s OR phone_number LIKE %s;"
-    with get_connection() as conn:
-        with conn.cursor() as cur:
-            cur.execute(sql, (f"%{query}%", f"{query}%"))
-            for row in cur.fetchall():
-                print(row)
+# Барлық контактіні көрсету
+def show_contacts():
+    conn = get_connection()
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM phonebook")
+    rows = cursor.fetchall()
+    conn.close()
+    print("\n--- Phonebook Contacts ---")
+    if not rows:
+        print("No contacts found.")
+    for row in rows:
+        print(f"ID: {row[0]} | Name: {row[1]} | Phone: {row[2]}")
 
-# 5. DELETE
-def delete_contact(identifier):
-    sql = "DELETE FROM contacts WHERE contact_name = %s OR phone_number = %s;"
-    with get_connection() as conn:
-        with conn.cursor() as cur:
-            cur.execute(sql, (identifier, identifier))
-            conn.commit()
-    print(f" Contact {identifier} deleted.")
+# Атын өшіру
+def delete_contact():
+    name = input("Enter name to delete: ")
+    conn = get_connection()
+    cursor = conn.cursor()
+    cursor.execute("DELETE FROM phonebook WHERE username = ?", (name,))
+    conn.commit()
+    conn.close()
+    print(f"Contact {name} deleted.")
 
 if __name__ == "__main__":
-    initialize_db(CREATE_TABLE_COMMAND)
-    # Осы жерден функцияларды шақырып тексеруге болады
+    create_table()
+    while True:
+        print("\n--- MENU ---")
+        print("1. Add from console")
+        print("2. Show all contacts")
+        print("3. Delete contact")
+        print("4. Exit")
+        choice = input("Select option: ")
+        
+        if choice == "1": insert_from_console()
+        elif choice == "2": show_contacts()
+        elif choice == "3": delete_contact()
+        elif choice == "4": break
+        else: print("Invalid choice!")
