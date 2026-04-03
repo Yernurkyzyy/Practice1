@@ -13,8 +13,9 @@ def create_table():
             phone VARCHAR(20)
         )
     """)
-    cur.close()   # 17-жол
-    conn.close()  # 18-жол (екіншісін өшір немесе осылай қалдыр)
+    conn.commit()
+    cur.close()   
+    conn.close()  
 
 def insert_from_console():
     username=input("Enter name: ")

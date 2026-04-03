@@ -1,8 +1,8 @@
 def load_config():
     return {
-        "dbname":"phonebook_db",
-        "user":"phoneuser",
-        "password":"1234",
-        "host":"localhost",
-        "port":"5432"
+        "host": "127.0.0.1",   # 127.0.0.1 арқылы рұқсат сұрамайды
+        "database": "phonebook",
+        "user": "macbookair", 
+        "password": "",
+        "port": 5432
     }
