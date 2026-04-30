@@ -1,0 +1,37 @@
+[
+    {
+        "first_name": "Ivan",
+        "last_name": "Ivanov",
+        "email": "ivan@mail.ru",
+        "birthday": "1988-08-08",
+        "group": null
+    },
+    {
+        "first_name": "Asel",
+        "last_name": "Bolatova",
+        "email": "asel@gmail.com",
+        "birthday": "2001-12-31",
+        "group": null
+    },
+    {
+        "first_name": "Arman",
+        "last_name": "Serikov",
+        "email": "arman@test.com",
+        "birthday": "1995-05-15",
+        "group": null
+    },
+    {
+        "first_name": "Daulet",
+        "last_name": "Bakyt",
+        "email": "daulet@work.kz",
+        "birthday": "1990-10-10",
+        "group": null
+    },
+    {
+        "first_name": "Aknur",
+        "last_name": "Samatova",
+        "email": "aknur@mail.com",
+        "birthday": "2000-01-01",
+        "group": null
+    }
+]
